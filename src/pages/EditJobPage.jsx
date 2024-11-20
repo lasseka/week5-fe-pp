@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, json } from "react-router-dom";
 
 const EditJobPage = () => {
   const { id } = useParams();
@@ -45,10 +45,46 @@ const EditJobPage = () => {
   const submitForm = (e) => {
     e.preventDefault();
     console.log("EditJobPage");
+
+    if (!title || !description || !companyName || !contactEmail || !location || !salary || !contactPhone){
+      alert("Fill all the fields, knobhead")
+      return;
+    }
+    const editedJob = {
+      title,
+      description,
+      company:{
+        name: companyName,
+        contactEmail,
+        contactPhone
+      },
+      location,
+      salary
+    }
+
+    editJob(editedJob)
   };
 
+  async function editJob(editedJob){
+    try {
+      const res = await fetch(`/api/jobs/${id}`, {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(editedJob)
+      })
+      if (res.ok){
+        console.log("Job edited successfully!");
+        navigate(`/`)
+      } else {
+        console.error("Failed to edit job");
+      }
+    } catch(error){
+      console.error("Error editing job:", error)
+    }
+  }
+
   const cancelEdit = () => {
-    console.log("cancelEdit");
+    navigate(`/`)
   };
 
   return (

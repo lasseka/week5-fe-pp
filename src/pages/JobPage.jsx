@@ -6,12 +6,44 @@ const JobPage = () => {
   const [job, setJob] = useState(null);
   const navigate = useNavigate();
 
-  const deleteJob = async () => {
-    console.log(JobPage);
-  };
+
+  useEffect(() => {
+    const fetchJob = async () => {
+      try{
+        const res = await fetch(`/api/jobs/${id}`, {
+          method: "GET",
+          headers: {"Content-Type": "application/json"}
+        });
+        if (!res.ok){
+          throw new Error("Failed to fetch job")
+        }
+        const data = await res.json();
+        setJob(data);
+        } catch(error){
+          console.error("Error fetching job details:", error);
+        }
+      };
+      fetchJob()
+  }, [id]);
 
   if (!job) {
     return <div>Loading...</div>;
+  }
+
+  async function deleteJob(job){
+    try{
+      const res = await fetch(`/api/jobs/${id}`, {
+        method: "DELETE",
+        headers: {"Content-Type": "application/json"}
+      });
+      if (!res.ok){
+        throw new Error("Failed to delete job")
+      }
+      console.log("Job deleted successfully");
+      navigate("/")
+    } catch (error){
+      console.error("Error deleting job: ", error)
+    }
   }
 
   return (
